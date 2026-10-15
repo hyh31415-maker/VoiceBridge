@@ -1,0 +1,42 @@
+name: Build macOS packages
+on:
+  workflow_dispatch:
+    inputs:
+      private_build:
+        description: Embed the repository secret in private artifacts (private repositories only)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject private builds in a public repository
+        if: inputs.private_build && !github.event.repository.private
+        run: echo 'Private builds require a private repository.'; exit 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install . pyinstaller pillow
+      - name: Compile and check modules
+        run: python -m compileall -q desktop
+      - name: Build public distribution
+        if: '!inputs.private_build'
+        run: python scripts/build_desktop.py
+      - name: Build private distribution
+        if: inputs.private_build && github.event.repository.private
+        env:
+          VOICEBRIDGE_EMBED_KEY: ${{ secrets.VOICEBRIDGE_EMBED_KEY }}
+        run: python scripts/build_desktop.py --private
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VoiceBridge-${{ matrix.os }}
+          path: dist/*.dmg
+          retention-days: 3

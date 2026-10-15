@@ -1,0 +1,15 @@
+build/
+dist/
+.venv/
+__pycache__/
+*.pyc
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+*.env
+credential*
+embedded_key.py
+BuildSecrets.java
+local.properties
+.DS_Store
