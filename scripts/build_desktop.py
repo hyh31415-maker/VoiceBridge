@@ -27,6 +27,8 @@ def main():
    run(['codesign','--force','--deep','--sign','-',app]);run(['codesign','--verify','--deep','--strict',app])
    os.environ['VOICEBRIDGE_DATA_DIR']=str(build/'test-profile')
    run([app/'Contents'/'MacOS'/'VoiceBridge','--self-test',out/'selfcheck.json'])
+   report=json.loads((out/'selfcheck.json').read_text(encoding='utf-8'))
+   if args.private and not (report.get('key_present') and report.get('session_updated')):raise RuntimeError('Private bundle credential/session self-test failed.')
    dmgroot=build/'dmg';dmgroot.mkdir(exist_ok=True)
    destination=dmgroot/'VoiceBridge.app'
    if destination.exists():shutil.rmtree(destination)

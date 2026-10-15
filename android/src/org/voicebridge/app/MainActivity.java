@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
  void toast(String message){Toast.makeText(this,message,Toast.LENGTH_LONG).show();}
  void show(String name){
   page=name;shell=column();shell.setBackgroundColor(BG);shell.setPadding(dp(16),dp(16),dp(16),dp(12));setContentView(shell);
+  if(Build.VERSION.SDK_INT>=35)shell.setOnApplyWindowInsetsListener((v,insets)->{android.graphics.Insets bars=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());v.setPadding(dp(16)+bars.left,dp(16)+bars.top,dp(16)+bars.right,dp(12)+bars.bottom);return insets;});
   TextView title=text("声桥",27,INK);title.setTypeface(null,Typeface.BOLD);shell.addView(title);shell.addView(text("VOICE BRIDGE  ·  "+name,11,MUTED));
   LinearLayout nav=row();for(String p:new String[]{"同传","声音","术语","历史","设置"})weighted(nav,button(p,()->show(p),p.equals(name)));shell.addView(nav);
   ScrollView scroll=new ScrollView(this);content=column();scroll.addView(content);shell.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));

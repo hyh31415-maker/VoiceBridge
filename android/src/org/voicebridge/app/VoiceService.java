@@ -55,7 +55,7 @@ public class VoiceService extends Service {
    int attempts=0;long failureStart=0;int[] delays={1,2,4,8,15};
    while(!terminate){
     if(stopping&&input.isEmpty())break;
-    Conn c=null;long connectedAt=SystemClock.elapsedRealtime();
+    Conn c=null;long connectedAt=0;
     try{
      status=attempts==0?"正在连接…":"正在重连…";segment++;c=new Conn(segment);connection=c;
      if(!c.connectBlocking(12,TimeUnit.SECONDS)||!c.ready.await(15,TimeUnit.SECONDS)||!c.configured)throw new IOException(c.error.isEmpty()?"连接超时":c.error);
@@ -76,7 +76,7 @@ public class VoiceService extends Service {
     }catch(Exception e){
      if(terminate||stopping)break;
      String error=Config.safe(e.getMessage(),key);if((c!=null&&c.fatal)||error.contains("401")||error.contains("403"))throw new Exception("密钥、权限或参数错误："+error);
-     if(failureStart==0)failureStart=SystemClock.elapsedRealtime();if(SystemClock.elapsedRealtime()-connectedAt>10000){attempts=0;failureStart=SystemClock.elapsedRealtime();}
+     if(failureStart==0)failureStart=SystemClock.elapsedRealtime();if(connectedAt>0&&SystemClock.elapsedRealtime()-connectedAt>10000){attempts=0;failureStart=SystemClock.elapsedRealtime();}
      if(++attempts>20||SystemClock.elapsedRealtime()-failureStart>300000)throw new Exception("重连未成功，请检查网络后重新开始");
      notice="连接中断，已发出但未确认的末尾可能不完整";int delay=delays[Math.min(attempts-1,4)];status=delay+" 秒后重连 · 最多缓存 60 秒";
      for(int i=0;i<delay*10&&!stopping&&!terminate;i++)Thread.sleep(100);

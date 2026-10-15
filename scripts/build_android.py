@@ -36,7 +36,7 @@ def main():
  secret.write_text('package org.voicebridge.app; public final class BuildSecrets { public static final String KEY = '+json.dumps(base64.b64encode(key.encode()).decode())+'; }',encoding='utf-8')
  exe='.exe' if os.name=='nt' else '';bat='.bat' if os.name=='nt' else ''
  run([tools/('aapt2'+exe),'compile','--dir',ROOT/'android'/'res','-o',work/'resources.zip'])
- run([tools/('aapt2'+exe),'link','-o',work/'unsigned.apk','-I',android,'--manifest',ROOT/'android'/'AndroidManifest.xml','--java',work/'gen',work/'resources.zip'])
+ run([tools/('aapt2'+exe),'link','-o',work/'unsigned.apk','-I',android,'--manifest',ROOT/'android'/'AndroidManifest.xml','--java',work/'gen','-A',ROOT/'android'/'assets',work/'resources.zip'])
  sources=list((ROOT/'android'/'src').rglob('*.java'))+list((work/'gen').rglob('*.java'))
  arguments=['-encoding','UTF-8','-source','8','-target','8','-bootclasspath',str(android)+os.pathsep+str(tools/'core-lambda-stubs.jar'),'-classpath',os.pathsep.join(map(relative,jars)),'-d',relative(work/'classes'),*map(relative,sources)]
  argfile=work/'javac.args';argfile.write_text('\n'.join('"'+s.replace('\\','/')+'"' for s in arguments),encoding='utf-8')
