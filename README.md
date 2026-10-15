@@ -27,6 +27,8 @@
 
 Python 3.13+，带 Tk。安装 `pip install .`，运行 `voicebridge`。打包时安装 PyInstaller，然后运行 `python scripts/build_desktop.py`。macOS 必须在 Mac 上构建，会生成拖入 Applications 安装的 DMG；生成的临时签名不是 Apple Developer ID 签名或公证。
 
+Windows 公开版可以运行 `python scripts/build_windows_release.py --iscc "C:\路径\ISCC.exe"`，生成安装程序与免安装 ZIP；不传 `--iscc` 则只生成 ZIP。该脚本会在独立配置目录验证应用启动且不含内置密钥。Windows 安装程序使用当前用户权限，卸载时保留个人设置与历史记录。
+
 GitHub Actions 工作流同时构建 Apple Silicon 和 Intel 版。默认公开构建不读取密钥。只有私有仓库中手动选择 `private_build` 才会读取同名 `VOICEBRIDGE_EMBED_KEY` 仓库 Secret。私有构建完成后应删除临时 Secret，并保管含密钥产物。
 
 ## Android 构建
